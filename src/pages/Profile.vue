@@ -4,6 +4,9 @@
 
     <input v-model="name" class="input" placeholder="Full Name" />
     <textarea v-model="bio" class="input" placeholder="Bio"></textarea>
+    <textarea v-model="age" class="input" placeholder="Age"></textarea>
+    <textarea v-model="dob" class="input" placeholder="Date of Birth"></textarea>
+
 
     <button @click="saveProfile" class="btn-primary w-full">Save</button>
 
