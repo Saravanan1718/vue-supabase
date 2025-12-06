@@ -17,8 +17,31 @@ export async function getProfile(userId) {
   return data
 }
 
+
 export async function upsertProfile(profile) {
   const { data, error } = await supabase.from('profiles').upsert(profile)
+  if (error) throw error
+  return data
+}
+
+export async function getTree(userId) {
+  const { data, error } = await supabase
+    .from('family_trees')
+    .select('tree_data')
+    .eq('user_id', userId)
+    .single()
+  
+  if (error && error.code !== 'PGRST116') throw error // PGRST116 is 0 rows
+  return data?.tree_data || []
+}
+
+export async function saveTree(userId, nodes) {
+  // Check if exists first to decide insert vs update, since user_id is unique
+  // Actually upsert works if we have the constraint.
+  const { data, error } = await supabase
+    .from('family_trees')
+    .upsert({ user_id: userId, tree_data: nodes }, { onConflict: 'user_id' })
+    
   if (error) throw error
   return data
 }
