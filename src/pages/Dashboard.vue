@@ -1,43 +1,12 @@
-<!-- <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
-    <main class="flex-1 p-0 overflow-hidden flex flex-col h-screen">
-      <div class="w-full h-full relative">
-        <div class="absolute top-4 left-4 z-20">
-             <button @click="handleLogout" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition">
-                Logout
-             </button>
-        </div>
-        <FamilyTree />
-      </div>
-    </main>
-  </div>
-</template> -->
-
-<!-- <script setup> -->
-// import { useRouter } from 'vue-router';
-// import { supabase } from '../supabase';
-// import FamilyTree from '../components/FamilyTree.vue';
-// import '../index.css'
-
-// const router = useRouter();
-
-// async function handleLogout() {
-//     const { error } = await supabase.auth.signOut();
-//     if (error) {
-//         console.error('Error logging out:', error);
-//         alert('Error logging out');
-//     } else {
-//         router.push('/login');
-//     }
-// }
-<!-- </script> -->
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
     <div class="max-w-4xl mx-auto">
 
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Your Family Trees</h1>
-        <button @click="createTree"
+
+        <button 
+          @click="showCreatePopup = true"
           class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
           + New Tree
         </button>
@@ -63,9 +32,10 @@
             >
               Edit
             </button>
+
             <button 
               class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm"
-              @click.stop="deleteTree(tree.tree_id)"
+              @click.stop="treeToDelete = tree.tree_id; showDeletePopup = true;"
             >
               Delete
             </button>
@@ -78,18 +48,41 @@
         class="mt-10 bg-gray-800 text-white px-4 py-2 rounded-lg">
         Logout
       </button>
-
     </div>
   </div>
+
+  <!-- Popup: Create Tree -->
+  <Popup
+    v-if="showCreatePopup"
+    title="Create New Tree"
+    input
+    placeholder="Enter tree name"
+    @cancel="showCreatePopup = false"
+    @confirm="createTree"
+  />
+
+  <!-- Popup: Confirm Delete -->
+  <Popup
+    v-if="showDeletePopup"
+    title="Delete this tree?"
+    @cancel="showDeletePopup = false"
+    @confirm="deleteTree"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { supabase } from "../supabase";
 import { useRouter } from "vue-router";
+import Popup from "../components/Popup.vue";
 
 const router = useRouter();
 const trees = ref([]);
+
+// Popup states
+const showCreatePopup = ref(false);
+const showDeletePopup = ref(false);
+const treeToDelete = ref(null);
 
 onMounted(loadTrees);
 
@@ -106,10 +99,11 @@ async function loadTrees() {
   trees.value = data || [];
 }
 
-async function createTree() {
-  const { data: { user } } = await supabase.auth.getUser();
-  const name = prompt("Tree name?");
+async function createTree(name) {
+  showCreatePopup.value = false;
   if (!name) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
 
   const { data: tree } = await supabase
     .from("family_tree_meta")
@@ -124,8 +118,11 @@ function openTree(id) {
   router.push(`/tree/${id}`);
 }
 
-async function deleteTree(id) {
-  if (!confirm("Delete this tree?")) return;
+async function deleteTree() {
+  const id = treeToDelete.value;
+  showDeletePopup.value = false;
+
+  if (!id) return;
 
   await supabase.from("family_tree_meta").delete().eq("tree_id", id);
   loadTrees();
