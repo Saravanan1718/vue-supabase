@@ -26,6 +26,17 @@
       :x2="l.x2" :y2="l.y"
       stroke="black" stroke-width="2"
     />
+    <line
+  v-for="(l,i) in parentChildLines"
+  :key="'pc'+i"
+  :x1="l.x1"
+  :y1="l.y1"
+  :x2="l.x2"
+  :y2="l.y2"
+  stroke="#444"
+  stroke-width="2"
+/>
+
   </g>
 </template>
 
@@ -144,4 +155,61 @@ const parentHorizontalLines = computed(() => {
 
   return lines;
 });
+
+const parentChildLines = computed(() => {
+  const lines = [];
+
+  for (const id in props.tree) {
+    const parent = props.tree[id];
+    if (!parent.children?.length) continue;
+
+    const p = props.nodes[id];
+    if (!p) continue;
+
+    const parentBottomX = p.x + p.w / 2;
+    const parentBottomY = p.y + p.h;
+
+    // midpoint Y
+    const midY = parentBottomY + 20;
+
+    // vertical down from parent
+    lines.push({
+      x1: parentBottomX,
+      y1: parentBottomY,
+      x2: parentBottomX,
+      y2: midY
+    });
+
+    const childXs = parent.children
+      .map(cid => props.nodes[cid])
+      .filter(Boolean)
+      .map(c => c.x + c.w / 2);
+
+    if (childXs.length > 1) {
+      // horizontal T bar
+      lines.push({
+        x1: Math.min(...childXs),
+        y1: midY,
+        x2: Math.max(...childXs),
+        y2: midY
+      });
+    }
+
+    // vertical down to each child
+    parent.children.forEach(cid => {
+      const c = props.nodes[cid];
+      if (!c) return;
+
+      lines.push({
+        x1: c.x + c.w / 2,
+        y1: midY,
+        x2: c.x + c.w / 2,
+        y2: c.y
+      });
+    });
+  }
+
+  return lines;
+});
+
 </script>

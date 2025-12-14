@@ -1,9 +1,11 @@
 <template>
-  <div 
-    ref="nodeRef"
-    class="bg-white border shadow rounded-xl p-4 w-44 text-center relative cursor-pointer hover:shadow-lg transition"
-    @click="openEditor"
-  >
+<div
+  ref="nodeRef"
+  class="group bg-white border shadow rounded-xl p-4 w-44 text-center
+         relative cursor-pointer hover:shadow-lg transition"
+  @click="openEditor"
+>
+
     
     <!-- Photo -->
     <img 
@@ -17,7 +19,7 @@
     <div class="font-semibold text-lg mt-2">{{ person.name }}</div>
 
     <!-- Buttons -->
-    <div class="flex justify-center gap-2 mt-3">
+    <!-- <div v-if="!exporting" class="flex justify-center gap-2 mt-3">
       <button 
         @click.stop="$emit('add-partner')"
         class="bg-blue-200 px-2 py-1 rounded text-sm"
@@ -27,7 +29,51 @@
         @click.stop="$emit('add-child')"
         class="bg-green-200 px-2 py-1 rounded text-sm"
       >+ Child</button>
-    </div>
+      <button
+        @click.stop="$emit('connect-partner', person.id)"
+        class="bg-purple-200 px-2 py-1 rounded text-sm"
+      >Link Partner</button>
+
+      <button
+        @click.stop="$emit('delete-person', person.id)"
+        class="bg-red-200 px-2 py-1 rounded text-sm"
+      >Delete</button>
+    </div> -->
+    <!-- Hover Actions -->
+<div
+  v-if="!exporting"
+  class="absolute -bottom-3 left-1/2 -translate-x-1/2
+         flex gap-1 opacity-0 group-hover:opacity-100 transition"
+>
+  <button
+    @click.stop="$emit('add-partner')"
+    class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full"
+  >
+    Partner
+  </button>
+
+  <button
+    @click.stop="$emit('connect-partner')"
+    class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full"
+  >
+    Link
+  </button>
+
+  <button
+    @click.stop="$emit('add-child')"
+    class="bg-green-500 text-white text-xs px-2 py-1 rounded-full"
+  >
+    Child
+  </button>
+
+  <button
+    @click.stop="$emit('delete-person', person.id)"
+    class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+  >
+    ✕
+  </button>
+</div>
+
   </div>
 </template>
 
@@ -36,6 +82,8 @@ import { onMounted, ref } from "vue";
 
 const props = defineProps({
   person: Object,
+  exporting: Boolean
+
 });
 
 const emit = defineEmits(["mounted", "edit-person"]);
