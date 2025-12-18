@@ -1,10 +1,13 @@
 <template>
 <div
   ref="nodeRef"
-  class="group bg-white border shadow rounded-xl p-4 w-44 text-center
-         relative cursor-pointer hover:shadow-lg transition"
+  :class="[
+    'group bg-white border shadow rounded-xl p-4 w-44 text-center relative cursor-pointer transition',
+    highlight ? 'ring-4 ring-indigo-400' : 'hover:shadow-lg'
+  ]"
   @click="openEditor"
 >
+
 
     
     <!-- Photo -->
@@ -66,27 +69,40 @@
     Child
   </button>
 
-  <button
-    @click.stop="$emit('delete-person', person.id)"
-    class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
-  >
-    ✕
-  </button>
+<button
+  @click.stop="$emit('confirm-delete', person.id)"
+  class="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+>
+  ✕
+</button>
+
 </div>
 
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref , computed} from "vue";
 
 const props = defineProps({
   person: Object,
-  exporting: Boolean
-
+  exporting: Boolean,
+  highlightId: Number
 });
 
-const emit = defineEmits(["mounted", "edit-person"]);
+const highlight = computed(() => props.person.id === props.highlightId);
+
+
+const emit = defineEmits([
+  "mounted",
+  "edit-person",
+  "add-partner",
+  "add-child",
+  "connect-partner",
+  "confirm-delete"
+]);
+
+
 
 const nodeRef = ref(null);
 

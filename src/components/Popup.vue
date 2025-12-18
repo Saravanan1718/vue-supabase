@@ -4,13 +4,37 @@
       <h2 class="text-lg font-semibold mb-4">{{ title }}</h2>
 
       <!-- Text input -->
-      <input 
+      <!-- <input 
         v-if="input"
         v-model="model"
         type="text"
         class="w-full border rounded-lg px-3 py-2 mb-4"
         :placeholder="placeholder"
-      />
+      /> -->
+      <!-- Autocomplete input -->
+      <div v-if="autocomplete">
+        <input
+          v-model="model"
+          type="text"
+          class="w-full border rounded-lg px-3 py-2 mb-2"
+          :placeholder="placeholder"
+        />
+
+        <div
+          v-if="suggestions.length"
+          class="border rounded-lg max-h-40 overflow-auto"
+        >
+          <div
+            v-for="item in suggestions"
+            :key="item.id"
+            class="px-3 py-2 cursor-pointer hover:bg-indigo-100"
+            @click="$emit('select', item)"
+          >
+            {{ item.name }}
+          </div>
+        </div>
+      </div>
+
 
       <div class="flex justify-end gap-3">
         <button 
@@ -35,13 +59,17 @@ import { ref, watch } from "vue";
 const props = defineProps({
   title: String,
   input: Boolean,
+  autocomplete: Boolean,
   placeholder: String,
+  suggestions: Array,
   modelValue: String
 });
+
 
 const model = ref(props.modelValue || "");
 
 watch(() => props.modelValue, v => model.value = v);
+watch(model, v => emit("update:modelValue", v));
 </script>
 
 <style>

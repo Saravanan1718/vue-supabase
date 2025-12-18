@@ -74,7 +74,10 @@
             @update-node-pos="updateNodePos"
             @edit-person="openEditor"
             @delete-person="deletePerson"
+            :highlightId="highlightId"
             @connect-partner="openLinkPartnerPopup"
+            @confirm-delete="confirmDelete"
+
           />
 
           <!-- CONNECTOR LINES -->
@@ -86,15 +89,26 @@
     </div>
 
     <!-- POPUP -->
-    <Popup
-      v-if="popup.show"
-      title="Link existing partner"
-      input
-      placeholder="Enter person name"
-      :model-value="searchName"
-      @confirm="handlePopupConfirm"
-      @cancel="closePopup"
-    />
+<Popup
+  v-if="popup.show && popup.type === 'link-partner'"
+  title="Link existing partner"
+  autocomplete
+  placeholder="Type name..."
+  :model-value="searchText"
+  :suggestions="partnerSuggestions"
+  @update:modelValue="v => searchText = v"
+  @select="selectPartner"
+  @cancel="popup.show = false"
+/>
+
+<Popup
+  v-if="popup.show && popup.type === 'delete'"
+  title="Delete this person?"
+  @confirm="handleDeleteConfirm"
+  @cancel="popup.show = false"
+/>
+
+
 
   </div>
 </template>
@@ -118,13 +132,43 @@ const nodePositions = reactive({});
 const selectedPerson = ref(null);
 const loaded = ref(false);
 const exporting = ref(false);
-const popup = ref({
-  show: false,
-  type: null,        // "link-partner"
-  sourceId: null
+const searchName = ref("");
+
+const popup = ref({ show: false, type: null, sourceId: null });
+const searchText = ref("");
+const highlightId = ref(null);
+
+const partnerSuggestions = computed(() => {
+  if (!searchText.value) return [];
+  return Object.values(tree).filter(
+    p =>
+      p.name &&
+      p.id !== popup.value.sourceId &&
+      p.name.toLowerCase().includes(searchText.value.toLowerCase())
+  );
 });
 
-const searchName = ref("");
+// function openLinkPartnerPopup(id) {
+//   popup.value = { show: true, type: "link-partner", sourceId: id };
+//   searchText.value = "";
+// }
+
+// function selectPartner(person) {
+//   const src = popup.value.sourceId;
+//   if (!tree[src] || !tree[person.id]) return;
+
+//   if (!tree[src].partners.includes(person.id))
+//     tree[src].partners.push(person.id);
+
+//   if (!tree[person.id].partners.includes(src))
+//     tree[person.id].partners.push(src);
+
+//   highlightId.value = person.id;
+//   popup.value.show = false;
+//   saveToSupabase();
+// }
+
+
 
 /* MULTI ROOTS */
 const roots = computed(() =>
@@ -160,6 +204,24 @@ function endPan() { isPanning = false; }
 function goBack() {
   router.push("/dashboard");
 }
+
+function selectPartner(person) {
+  const sourceId = popup.value.sourceId;
+
+  if (!tree[sourceId] || !tree[person.id]) return;
+
+  if (!tree[sourceId].partners.includes(person.id))
+    tree[sourceId].partners.push(person.id);
+
+  if (!tree[person.id].partners.includes(sourceId))
+    tree[person.id].partners.push(sourceId);
+
+  highlightId.value = person.id;
+
+  popup.value.show = false;
+  saveToSupabase();
+}
+
 
 /* EDIT */
 function openEditor(person) {
@@ -341,6 +403,8 @@ function openLinkPartnerPopup(id) {
     sourceId: id
   };
   searchName.value = "";
+  highlightId.value = null;
+
 }
 
 function handlePopupConfirm(value) {
@@ -371,6 +435,18 @@ function handlePopupConfirm(value) {
 
   popup.value.show = false;
 }
+
+function confirmDelete(id) {
+  popup.value = { show: true, type: "delete", sourceId: id };
+}
+
+function handleDeleteConfirm() {
+  if (popup.value.sourceId) {
+    deletePerson(popup.value.sourceId);
+  }
+  popup.value.show = false;
+}
+
 function closePopup() {
   popup.value.show = false;
 }
