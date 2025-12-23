@@ -7,27 +7,27 @@
     @mouseup="endPan"
   >
     <!-- TOP RIGHT CONTROLS -->
-    <div class="fixed top-4 right-4 z-50 flex gap-3">
-      <button @click="goBack" class="bg-white shadow px-4 py-2 rounded-lg">
+    <div class="fixed top-4 right-4 z-50 flex flex-wrap justify-end gap-2 max-w-[calc(100vw-80px)] pointer-events-none">
+      <button @click="goBack" class="bg-white shadow px-2 py-1 text-xs md:px-4 md:py-2 md:text-base rounded-lg pointer-events-auto">
         ⬅ Back
       </button>
       <button
         @click="addRoot"
-        class="bg-green-600 text-white shadow px-4 py-2 rounded-lg"
+        class="bg-green-600 text-white shadow px-2 py-1 text-xs md:px-4 md:py-2 md:text-base rounded-lg pointer-events-auto"
       >
         + Add Family
       </button>
 
       <button
         @click="saveToSupabase"
-        class="bg-indigo-600 text-white shadow px-4 py-2 rounded-lg"
+        class="bg-indigo-600 text-white shadow px-2 py-1 text-xs md:px-4 md:py-2 md:text-base rounded-lg pointer-events-auto"
       >
         Save All
       </button>
 
       <button
         @click="exportPNG"
-        class="bg-white shadow px-4 py-2 rounded-lg"
+        class="bg-white shadow px-2 py-1 text-xs md:px-4 md:py-2 md:text-base rounded-lg pointer-events-auto"
       >
         Export PNG
       </button>

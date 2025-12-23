@@ -2,13 +2,22 @@
 <div
   ref="nodeRef"
   :class="[
-    'group bg-white border shadow rounded-xl p-4 w-44 text-center relative cursor-pointer transition',
+    'group border shadow rounded-xl p-4 w-44 text-center relative cursor-default transition',
+    bgColor,
     highlight ? 'ring-4 ring-indigo-400' : 'hover:shadow-lg'
   ]"
-  @click="openEditor"
 >
-
-
+    <!-- Edit Button (Top Right) -->
+    <button 
+      v-if="!exporting"
+      @click.stop="openEditor"
+      class="absolute top-2 right-2 p-1 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-indigo-50 transition opacity-0 group-hover:opacity-100"
+      title="Edit"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+      </svg>
+    </button>
     
     <!-- Photo -->
     <img 
@@ -91,6 +100,12 @@ const props = defineProps({
 });
 
 const highlight = computed(() => props.person.id === props.highlightId);
+
+const bgColor = computed(() => {
+  if (props.person.gender === 'male') return 'bg-blue-100';
+  if (props.person.gender === 'female') return 'bg-pink-100';
+  return 'bg-white';
+});
 
 
 const emit = defineEmits([

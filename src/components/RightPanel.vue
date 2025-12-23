@@ -1,5 +1,5 @@
 <template>
-  <div v-if="person" class="fixed right-0 top-0 w-80 h-full bg-white shadow-xl p-6 overflow-y-auto">
+  <div v-if="person" ref="panelRef" class="fixed right-0 top-0 w-80 h-full bg-white shadow-xl p-6 overflow-y-auto">
     <h2 class="text-xl font-bold mb-4">Edit Person</h2>
     
     <div class="w-full flex justify-center mb-4">
@@ -112,14 +112,33 @@ const edit = reactive({
   gender: "",
 });
 
+const panelRef = ref(null);
+
+function handleClickOutside(e) {
+  if (panelRef.value && !panelRef.value.contains(e.target)) {
+    emit("close");
+  }
+}
+
 watch(
   () => props.person,
-  () => {
-    if (props.person) {
-      Object.assign(edit, props.person);
+  (val) => {
+    if (val) {
+      Object.assign(edit, val);
+      setTimeout(() => {
+        window.addEventListener("click", handleClickOutside);
+      }, 0);
+    } else {
+      window.removeEventListener("click", handleClickOutside);
     }
-  }
+  },
+  { immediate: true }
 );
+
+import { onBeforeUnmount } from "vue";
+onBeforeUnmount(() => {
+  window.removeEventListener("click", handleClickOutside);
+});
 
 function save() {
   emit("save", { ...edit });
