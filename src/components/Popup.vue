@@ -4,13 +4,13 @@
       <h2 class="text-lg font-semibold mb-4">{{ title }}</h2>
 
       <!-- Text input -->
-      <!-- <input 
+      <input 
         v-if="input"
         v-model="model"
         type="text"
         class="w-full border rounded-lg px-3 py-2 mb-4"
         :placeholder="placeholder"
-      /> -->
+      />
       <!-- Autocomplete input -->
       <div v-if="autocomplete">
         <input
