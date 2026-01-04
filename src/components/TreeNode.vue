@@ -102,8 +102,8 @@ const props = defineProps({
 const highlight = computed(() => props.person.id === props.highlightId);
 
 const bgColor = computed(() => {
-  if (props.person.gender === 'male') return 'bg-blue-100';
-  if (props.person.gender === 'female') return 'bg-pink-100';
+  if (props.person.gender === 'male') return 'bg-blue-50 border-blue-200';
+  if (props.person.gender === 'female') return 'bg-pink-50 border-pink-200';
   return 'bg-white';
 });
 
